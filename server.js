@@ -7,10 +7,14 @@ require('dotenv').config();
 const app = express();
 
 // 1. Middlewares
+// server.js mein cors wala hissa aise change karein
 app.use(cors({
-  origin: "http://localhost:5173", // Ya "*" agar aap development mein hain
+  origin: [
+    "http://localhost:5173", 
+    "https://az-developers.vercel.app" // Apni live site ko allow karein
+  ],
   methods: ["GET", "POST", "PUT", "DELETE"],
-  allowedHeaders: ["Content-Type", "admin-secret-key"], // Is header ko explicitly allow karein
+  allowedHeaders: ["Content-Type", "admin-secret-key"],
   credentials: true
 }));
 app.use(express.json());
