@@ -6,7 +6,10 @@ require('dotenv').config();
 
 const app = express();
 
-// Isay apne routes se UPAR rakhein
+// 1. Body Parser sabse upar
+app.use(express.json());
+
+// 2. CORS Setup
 app.use(cors({
   origin: "https://az-developers.vercel.app",
   credentials: true,
@@ -14,26 +17,28 @@ app.use(cors({
   allowedHeaders: ["Content-Type", "admin-secret-key"]
 }));
 
-// OPTIONS request ko handle karne ka sabse asan tareeka
-app.options('*', cors());
+// 3. Manual Pre-flight Handler (Vercel ke liye bulletproof tareeka)
+app.options('*', (req, res) => {
+  res.header('Access-Control-Allow-Origin', 'https://az-developers.vercel.app');
+  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+  res.header('Access-Control-Allow-Headers', 'Content-Type, admin-secret-key');
+  res.header('Access-Control-Allow-Credentials', 'true');
+  res.sendStatus(200);
+});
 
-app.use(express.json());
-
-// 2. Static Folder for Images (Multer ke liye zaroori hai)
-
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
-
-// 3. Database Connection
-mongoose.connect(process.env.MONGO_URI)
-  .then(() => {
-    console.log('✅ MongoDB Connected...');
-  })
-  .catch((err) => { 
-    console.error('❌ Error connecting to MongoDB:', err);
-  });
-
-// 4. Routes Import
-const portfolioRoutes = require('./routes/portfolioRoutes');
+// 4. Login Route (Isay portfolioRoutes se UPAR rakhein)
+app.post('/api/v1/auth/login', (req, res) => {
+  const { password } = req.body;
+  
+  if (password === process.env.ADMIN_PASSWORD) {
+    return res.json({ 
+      success: true, 
+      adminKey: process.env.ADMIN_SECRET_KEY 
+    });
+  } else {
+    return res.status(401).json({ success: false, message: "Wrong Password!" });
+  }
+});
 
 // 5. Routes Middleware
 app.use('/api/v1', portfolioRoutes);
