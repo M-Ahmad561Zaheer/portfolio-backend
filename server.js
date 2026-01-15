@@ -53,7 +53,7 @@ app.post('/api/v1/auth/login', (req, res) => {
       adminKey: process.env.ADMIN_SECRET_KEY // Backend se "len5616" bhej raha hai
     });
   } else {
-    res.status(401).json({ success: false, message: "Ghalat Password!" });
+    res.status(401).json({ success: false, message: "Wrong Password!" });
   }
 });
 
