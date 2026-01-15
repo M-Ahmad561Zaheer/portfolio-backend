@@ -1,9 +1,16 @@
 {
   "version": 2,
   "rewrites": [
+    { "source": "/(.*)", "destination": "/server.js" }
+  ],
+  "headers": [
     {
       "source": "/(.*)",
-      "destination": "/server.js"
+      "headers": [
+        { "key": "Access-Control-Allow-Origin", "value": "https://az-developers.vercel.app" },
+        { "key": "Access-Control-Allow-Methods", "value": "GET,POST,PUT,DELETE,OPTIONS" },
+        { "key": "Access-Control-Allow-Headers", "value": "Content-Type, Authorization, admin-secret-key" }
+      ]
     }
   ]
 }

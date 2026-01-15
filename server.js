@@ -7,13 +7,23 @@ require('dotenv').config();
 const app = express();
 
 // 1. Middlewares
-// server.js mein cors wala hissa aise change karein
 app.use(cors({
-  origin: "https://az-developers.vercel.app", // Exact live domain
+  origin: "https://az-developers.vercel.app",
   methods: ["GET", "POST", "PUT", "DELETE"],
   allowedHeaders: ["Content-Type", "admin-secret-key"],
   credentials: true
 }));
+
+// Very Important for Vercel
+app.options("*", cors({
+  origin: "https://az-developers.vercel.app",
+  methods: ["GET", "POST", "PUT", "DELETE"],
+  allowedHeaders: ["Content-Type", "admin-secret-key"],
+  credentials: true
+}));
+//
+app.options("*", cors());
+
 
 app.use(express.json());
 
