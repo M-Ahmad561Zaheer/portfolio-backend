@@ -7,16 +7,21 @@ require('dotenv').config();
 const app = express();
 
 // 1. CORS Configuration
-const corsOptions = {
-  origin: "https://az-developers.vercel.app", // Bilkul exact domain
-  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-  allowedHeaders: ["Content-Type", "admin-secret-key"],
+// server.js ke bilkul shuru mein (after app = express())
+app.use(cors({
+  origin: "https://az-developers.vercel.app",
   credentials: true,
-  optionsSuccessStatus: 200 // Legacy browsers ke liye zaroori hai
-};
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "admin-secret-key"]
+}));
 
-app.use(cors(corsOptions));
-app.options("*", cors(corsOptions)); // Sab routes ke liye preflight handle karega
+// Isay routes se pehle likhein
+app.use((req, res, next) => {
+  if (req.method === 'OPTIONS') {
+    return res.sendStatus(200);
+  }
+  next();
+});
 
 app.use(express.json());
 
