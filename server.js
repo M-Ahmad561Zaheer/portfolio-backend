@@ -9,14 +9,12 @@ const app = express();
 // 1. Middlewares
 // server.js mein cors wala hissa aise change karein
 app.use(cors({
-  origin: [
-    "http://localhost:5173", 
-    "https://az-developers.vercel.app" // Apni live site ko allow karein
-  ],
+  origin: "*", // Yeh har jagah se request allow karega
   methods: ["GET", "POST", "PUT", "DELETE"],
   allowedHeaders: ["Content-Type", "admin-secret-key"],
   credentials: true
 }));
+
 app.use(express.json());
 
 // 2. Static Folder for Images (Multer ke liye zaroori hai)
