@@ -6,24 +6,17 @@ require('dotenv').config();
 
 const app = express();
 
-// 1. Middlewares
-app.use(cors({
-  origin: "https://az-developers.vercel.app",
-  methods: ["GET", "POST", "PUT", "DELETE"],
+// 1. CORS Configuration
+const corsOptions = {
+  origin: "https://az-developers.vercel.app", // Bilkul exact domain
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
   allowedHeaders: ["Content-Type", "admin-secret-key"],
-  credentials: true
-}));
+  credentials: true,
+  optionsSuccessStatus: 200 // Legacy browsers ke liye zaroori hai
+};
 
-// Very Important for Vercel
-app.options("*", cors({
-  origin: "https://az-developers.vercel.app",
-  methods: ["GET", "POST", "PUT", "DELETE"],
-  allowedHeaders: ["Content-Type", "admin-secret-key"],
-  credentials: true
-}));
-//
-app.options("*", cors());
-
+app.use(cors(corsOptions));
+app.options("*", cors(corsOptions)); // Sab routes ke liye preflight handle karega
 
 app.use(express.json());
 
