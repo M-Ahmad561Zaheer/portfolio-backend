@@ -9,7 +9,7 @@ const app = express();
 // 1. Middlewares
 // server.js mein cors wala hissa aise change karein
 app.use(cors({
-  origin: "*", // Yeh har jagah se request allow karega
+  origin: "https://az-developers.vercel.app", // Exact live domain
   methods: ["GET", "POST", "PUT", "DELETE"],
   allowedHeaders: ["Content-Type", "admin-secret-key"],
   credentials: true
