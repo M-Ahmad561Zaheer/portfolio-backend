@@ -8,8 +8,8 @@ const app = express();
 
 // 1. Middlewares
 app.use(cors({
-  origin: "https://az-developers.vercel.app",
-  methods: ["GET", "POST", "PUT", "DELETE"],
+  origin: ["https://az-developers.vercel.app", "https://portfolio-frontend-rust-pi.vercel.app"],
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
   allowedHeaders: ["Content-Type", "admin-secret-key"],
   credentials: true
 }));
