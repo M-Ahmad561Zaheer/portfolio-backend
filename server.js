@@ -43,21 +43,27 @@ app.get('/', (req, res) => {
     res.send('Portfolio API is Running...');
 });
 
-// 7. Login Route
+
+// 8. Login Route
 app.post('/api/v1/auth/login', (req, res) => {
   const { password } = req.body;
 
+  // Logs hamesha response se PEHLE honi chahiye
+  console.log("Input Pass:", password);
+  console.log("Env Pass:", process.env.ADMIN_PASSWORD);
+
   if (password === process.env.ADMIN_PASSWORD) {
-    res.json({ 
+    return res.json({ 
       success: true, 
-      adminKey: process.env.ADMIN_SECRET_KEY // Backend se "len5616" bhej raha hai
+      adminKey: process.env.ADMIN_SECRET_KEY 
     });
   } else {
-    res.status(401).json({ success: false, message: "Ghalat Password!" });
+    // Agar ye 401 aa raha hai, toh upar wala log bataye ga kyun
+    return res.status(401).json({ success: false, message: "Ghalat Password!" });
   }
 });
 
-// 7. Port Configuration
+// 9. Port Configuration
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`🚀 Server started on port ${PORT}`));
 
