@@ -9,12 +9,13 @@ const app = express();
 // 1. Middlewares
 app.use(cors({
   origin: ["https://az-developers.vercel.app", "https://portfolio-frontend-rust-pi.vercel.app"],
-  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-  allowedHeaders: ["Content-Type", "admin-secret-key"],
-  credentials: true
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"], // OPTIONS yahan shamil hai
+  allowedHeaders: ["Content-Type", "admin-secret-key", "Authorization"],
+  credentials: true,
+  preflightContinue: false,
+  optionsSuccessStatus: 204
 }));
 
-app.options('*', cors()); // Har route par Pre-flight requests allow karega
 
 app.use(express.json());
 
@@ -59,3 +60,5 @@ app.post('/api/v1/auth/login', (req, res) => {
 // 7. Port Configuration
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`🚀 Server started on port ${PORT}`));
+
+module.exports=app;
