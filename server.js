@@ -14,6 +14,7 @@ app.use(cors({
   credentials: true
 }));
 
+app.options('*', cors()); // Har route par Pre-flight requests allow karega
 
 app.use(express.json());
 
