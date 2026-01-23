@@ -1,10 +1,14 @@
 const nodemailer = require('nodemailer');
-const Message = require('../models/Message');
+const Message = require('../models/Message'); // Aapka Message Model
 
-// "export const" ko "const" kar dein agar CommonJS use kar rahe hain
-const replyToMessage = async (req, res) => {
-  // 1. adminPassword yahan se hata dein kyunke ye frontend se nahi aa raha
-  const { id, to, subject, message } = req.body; 
+export const replyToMessage = async (req, res) => {
+  const { id, to, subject, message, adminPassword } = req.body; 
+
+  // --- SECURITY CHECK ---
+  // Sirf tabhi reply bhejein jab request mein sahi password ho
+  if (adminPassword !== process.env.ADMIN_PASSWORD) {
+    return res.status(403).json({ success: false, message: "Unauthorized access!" });
+  }
 
   try {
     const transporter = nodemailer.createTransport({
@@ -15,15 +19,13 @@ const replyToMessage = async (req, res) => {
       },
     });
 
-    // 2. Email bhejna
     await transporter.sendMail({
-      from: `AZ Developers <${process.env.EMAIL_USER}>`,
+      from: `AZ Developers <${process.env.EMAIL_USER}>`, // Professional name
       to,
       subject,
       text: message,
     });
 
-    // 3. Database update karna
     await Message.findByIdAndUpdate(id, { 
       status: 'Replied',
       replyText: message 
@@ -31,9 +33,7 @@ const replyToMessage = async (req, res) => {
 
     res.status(200).json({ success: true, message: "Reply sent and DB updated!" });
   } catch (error) {
-    console.error("Nodemailer Error:", error);
-    res.status(500).json({ success: false, error: error.message || "Failed to send reply" });
+    console.error(error);
+    res.status(500).json({ success: false, error: "Failed to send reply" });
   }
 };
-
-module.exports = { replyToMessage }; // Export sahi karein
