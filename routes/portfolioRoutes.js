@@ -138,13 +138,37 @@ router.get('/messages', adminAuth, async (req, res) => {
 });
 
 // --- DELETE ROUTES ---
+
+// 1. Delete Project
 router.delete('/projects/:id', adminAuth, async (req, res) => {
     try {
         await Project.findByIdAndDelete(req.params.id);
-        res.json({ message: "Deleted" });
+        res.json({ success: true, message: "Project Deleted" });
     } catch (err) { res.status(500).json({ message: err.message }); }
 });
 
-// [Aise hi baki delete aur update routes bhi adminAuth ke saath rakhein]
+// 2. Delete Education
+router.delete('/education/:id', adminAuth, async (req, res) => {
+    try {
+        await Education.findByIdAndDelete(req.params.id);
+        res.json({ success: true, message: "Education Deleted" });
+    } catch (err) { res.status(500).json({ message: err.message }); }
+});
+
+// 3. Delete Experience
+router.delete('/experience/:id', adminAuth, async (req, res) => {
+    try {
+        await Experience.findByIdAndDelete(req.params.id);
+        res.json({ success: true, message: "Experience Deleted" });
+    } catch (err) { res.status(500).json({ message: err.message }); }
+});
+
+// 4. Delete Message
+router.delete('/messages/:id', adminAuth, async (req, res) => {
+    try {
+        await Message.findByIdAndDelete(req.params.id);
+        res.json({ success: true, message: "Message Deleted" });
+    } catch (err) { res.status(500).json({ message: err.message }); }
+});
 
 module.exports = router;
