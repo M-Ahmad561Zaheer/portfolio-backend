@@ -8,18 +8,11 @@ const app = express();
 
 // 1. Middlewares
 app.use(cors({
-  origin: [
-    "https://az-developers.vercel.app", 
-    "https://portfolio-frontend-rust-pi.vercel.app", // Fixed '.gapp' to '.app'
-    "http://localhost:5173" // Local testing ke liye zaroori hai
-  ],
+  origin: ["https://az-developers.vercel.app", "https://portfolio-frontend-rust-pi.vercel.app"],
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
   allowedHeaders: ["Content-Type", "admin-secret-key", "Authorization"],
   credentials: true
 }));
-
-// CORS ke baad ye zaroor likhein
-app.options('*', cors());
 
 app.use(express.json());
 
