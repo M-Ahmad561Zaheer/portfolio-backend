@@ -64,9 +64,18 @@ router.post('/experience', adminAuth, async (req, res) => {
 // --- PROJECTS ROUTES ---
 router.get('/projects', async (req, res) => {
     try {
+        // Check karein ke Project model defined hai ya nahi
+        if (!Project) {
+            return res.status(500).json({ message: "Project Model not found" });
+        }
+        
         const projs = await Project.find().sort({ createdAt: -1 });
-        res.json(projs || []);
-    } catch (err) { res.status(500).json({ message: err.message }); }
+        // Hamesha array return karein
+        res.status(200).json(projs || []);
+    } catch (err) { 
+        console.error("Projects Fetch Error:", err); // Ye Vercel logs mein dikhega
+        res.status(500).json({ message: "Database Error: " + err.message }); 
+    }
 });
 
 router.post('/projects', adminAuth, upload.single('image'), async (req, res) => {
