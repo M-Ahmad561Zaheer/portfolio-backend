@@ -15,8 +15,8 @@ app.use(cors({
     "http://localhost:5173"
   ],
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-  allowedHeaders: ["Content-Type", "Authorization"],
-  credentials: true // ✅ Taake cookies allow hon
+  allowedHeaders: ["Content-Type", "Authorization"], // admin-secret-key yahan se hata dein
+  credentials: true 
 }));
 
 app.use(cookieParser()); // ✅ Ye line missing thi, iske baghair req.cookies nahi chalega
