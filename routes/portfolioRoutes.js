@@ -5,6 +5,7 @@ const Education = require('../models/Education');
 const Project = require('../models/Project');
 const nodemailer = require('nodemailer');
 const Message = require('../models/Message');
+const Review = require('../models/Review');
 const cloudinary = require('cloudinary').v2;
 const { CloudinaryStorage } = require('multer-storage-cloudinary');
 const multer = require('multer');
@@ -137,6 +138,31 @@ router.get('/messages', adminAuth, async (req, res) => {
     } catch (err) { res.status(500).json({ message: err.message }); }
 });
 
+
+// --- DASHBOARD STATS ROUTE ---
+router.get('/dashboard-stats', adminAuth, async (req, res) => {
+    try {
+        const totalProjects = await Project.countDocuments();
+        const totalMessages = await Message.countDocuments();
+        const pendingMessages = await Message.countDocuments({ status: 'Pending' });
+        const totalExperience = await Experience.countDocuments();
+        const totalReviews = await Review.countDocuments();
+
+        res.status(200).json({
+            success: true,
+            stats: {
+                projects: totalProjects,
+                messages: totalMessages,
+                pending: pendingMessages,
+                experience: totalExperience,
+                reviews: totalReviews
+            }
+        });
+    } catch (err) {
+        res.status(500).json({ success: false, message: err.message });
+    }
+});
+
 // --- DELETE ROUTES ---
 
 // 1. Delete Project
@@ -169,6 +195,103 @@ router.delete('/messages/:id', adminAuth, async (req, res) => {
         await Message.findByIdAndDelete(req.params.id);
         res.json({ success: true, message: "Message Deleted" });
     } catch (err) { res.status(500).json({ message: err.message }); }
+});
+
+// --- MESSAGE REPLY ROUTE ---
+router.post('/messages/reply', adminAuth, async (req, res) => {
+    const { id, to, subject, message } = req.body;
+
+    try {
+        // 1. Nodemailer Transporter Setup
+        const transporter = nodemailer.createTransport({
+            service: 'gmail',
+            auth: {
+                user: process.env.EMAIL_USER,
+                pass: process.env.EMAIL_PASS
+            }
+        });
+
+        const mailOptions = {
+            from: process.env.EMAIL_USER,
+            to: to, // User ka email
+            subject: subject,
+            text: message
+        };
+
+        // 2. Send Email
+        await transporter.sendMail(mailOptions);
+
+        // 3. Update Message in Database (Status and Reply Text)
+        const updatedMessage = await Message.findByIdAndUpdate(
+            id, 
+            { 
+                status: 'Replied', 
+                replyText: message 
+            }, 
+            { new: true }
+        );
+
+        if (!updatedMessage) {
+            return res.status(404).json({ success: false, message: "Message ID not found in database." });
+        }
+
+        res.status(200).json({ success: true, message: "Reply delivered and database updated!" });
+
+    } catch (err) {
+        console.error("Reply Error:", err);
+        res.status(500).json({ success: false, message: "Failed to send email. Check your Gmail App Password." });
+    }
+});
+                 
+// --- REVIEWS ROUTES ---
+ 
+// 1. Get all reviews (For Admin & Frontend)
+router.get('/reviews', async (req, res) => {
+    try {
+        const reviews = await Review.find().sort({ createdAt: -1 });
+        res.json(reviews);
+    } catch (err) {
+        res.status(500).json({ message: err.message });
+    }
+});
+
+// 2. Add a new Review (Admin Only)
+router.post('/reviews', adminAuth, async (req, res) => {
+    try {
+        const newReview = new Review(req.body);
+        await newReview.save();
+        res.status(201).json({ success: true, message: "Review Added!" });
+    } catch (err) {
+        res.status(400).json({ message: err.message });
+    }
+});
+
+// 3. Delete Review
+router.delete('/reviews/:id', adminAuth, async (req, res) => {
+    try {
+        await Review.findByIdAndDelete(req.params.id);
+        res.json({ message: "Review Deleted" });
+    } catch (err) {
+        res.status(500).json({ message: err.message });
+    }
+});
+// 4. Update Review (Admin Only)
+router.put('/reviews/:id', adminAuth, async (req, res) => {
+    try {
+        const updatedReview = await Review.findByIdAndUpdate(
+            req.params.id, 
+            req.body, 
+            { new: true } // Taake updated data wapis milay
+        );
+        
+        if (!updatedReview) {
+            return res.status(404).json({ message: "Review not found!" });
+        }
+        
+        res.json({ success: true, message: "Review Updated!", data: updatedReview });
+    } catch (err) {
+        res.status(400).json({ message: err.message });
+    }
 });
 
 module.exports = router;
